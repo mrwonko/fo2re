@@ -375,38 +375,38 @@ SPVS Files
 Geom Files
 ==========
 
-{
-	int unknown1; // read to local variable; is 0x00020001 for forest1; some version?
-	int unknown2; // read to local variable; not read if unknown1 < [10210E8] (always 0x00020000?)
-	
-	something
-	
-	// Objects read via 0x005985C0 (ReadGeomCreateBuffers)
-	unsigned int count1; // number of objects following
-	// for each count1:
 	{
-		int type; // 1, 2, or 3
-		// if type 1: vertex data
+		int unknown1; // read to local variable; is 0x00020001 for forest1; some version?
+		int unknown2; // read to local variable; not read if unknown1 < [10210E8] (always 0x00020000?)
+		
+		something
+		
+		// Objects read via 0x005985C0 (ReadGeomCreateBuffers)
+		unsigned int count1; // number of objects following
+		// for each count1:
 		{
-			// to be determined
-			// references vertexcolors_w2.w32 content
-		}
-		// if type 2: index data (triangles)
-		{
-			// to be determined
-		}
-		if type 3: other data (=?)
-		{
-			int unknown; // not used by game?
-			unsigned int objSize;  // or count? likely size.
-			unsigned int objCount; // or size? likely count. not remembered past loading into array (?). So maybe size after all?
-			// objCount times:
+			int type; // 1, 2, or 3
+			// if type 1: vertex data
 			{
-				// object of objSize size
+				// to be determined
+				// references vertexcolors_w2.w32 content
+			}
+			// if type 2: index data (triangles)
+			{
+				// to be determined
+			}
+			if type 3: other data (=?)
+			{
+				int unknown; // not used by game?
+				unsigned int objSize;  // or count? likely size.
+				unsigned int objCount; // or size? likely count. not remembered past loading into array (?). So maybe size after all?
+				// objCount times:
+				{
+					// object of objSize size
+				}
 			}
 		}
 	}
-}
 
 
 
