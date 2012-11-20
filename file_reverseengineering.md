@@ -36,9 +36,9 @@ It would appear that the pointer to the object of that class is in ECX
 		// presumably 6 more
 	};
 
-File opening via KERNEL32.CreateFileA, in BvhFile_Open and others
-File reading via KERNEL32.ReadFile, in BvhFile_FillBuffer, which fills FileObject::buffer
-File closing via KERNEL32.CloseHandle, BvhFile_Func5
+* File opening via KERNEL32.CreateFileA, in BvhFile_Open and others
+* File reading via KERNEL32.ReadFile, in BvhFile_FillBuffer, which fills FileObject::buffer
+* File closing via KERNEL32.CloseHandle, BvhFile_Func5
 
 
 
@@ -46,16 +46,16 @@ File closing via KERNEL32.CloseHandle, BvhFile_Func5
 File processing order (game start)
 ==================================
 
-Open, Read, Close data/database/flatout2.db
-Open, Read, Close data/language/languages.dat
-Open, Read, Close data/language/version.ini
-Open, Read, Close savegame/device.cfg
-Open, Read, Close data/language/language2.dat
-[load shaders (data/shader/)]
-[load definition files]
-data/settings/game.ini
-[savegame]
-[fonts, hud]
+	Open, Read, Close data/database/flatout2.db
+	Open, Read, Close data/language/languages.dat
+	Open, Read, Close data/language/version.ini
+	Open, Read, Close savegame/device.cfg
+	Open, Read, Close data/language/language2.dat
+	[load shaders (data/shader/)]
+	[load definition files]
+	data/settings/game.ini
+	[savegame]
+	[fonts, hud]
 
 
 
@@ -63,39 +63,39 @@ data/settings/game.ini
 File processing order (track start)
 ===================================
 
-data/global/particles/hud_particles_2d.bed
-data/menu/loading_bg_<levelname>.tga
-hud
-sounds
-scripts
-data/tracks/<track>/lighting/sh_w2.ini
-data/tracks/<track>/data/effectmap.4b
-global filters/environment stuff (sun, skybox)
-data/tracks/<track>/lighting/shadowmap_w2.dat
-data/tracks/<track>/geometry/track_bvh.dat (and turn 2nd array's entries' offsets into pointers)
-data/tracks/<track>/geometry/track_spvs.dat
-data/global/dynamics/dynamic_objects.bed
-data/settings/lods.ini
-data/tracks/<track>/lighting/vertexcolors_w2.w32
-data/tracks/<track>/geometry/track_geom.w32
-data/tracks/<track>/geometry/track_cdb2.gen
-data/tracks/<track>/geometry/plant_vdb.gen (loading of this is pretty weird...)
-data/tracks/<track>/geometry/plant_geom.w32
-data/tracks/<track>/data/resetmap.4b
-data/tracks/<track>/data/trackai.bin
-cars (player's?)
-drivers (player's?)
-[ cdb tree traversial starts here ]
-data/tracks/<track>/data/camera.ini
-data/scripts/cameratemplates.bed
-menu stuff
-flares and other graphics, map, particles, skybox
-data/tracks/<track>/lighting/lightmap1_w2.dds
-textures (in alphabetical order)
-cars
-drivers
-hud
-sounds
+	data/global/particles/hud_particles_2d.bed
+	data/menu/loading_bg_<levelname>.tga
+	hud
+	sounds
+	scripts
+	data/tracks/<track>/lighting/sh_w2.ini
+	data/tracks/<track>/data/effectmap.4b
+	global filters/environment stuff (sun, skybox)
+	data/tracks/<track>/lighting/shadowmap_w2.dat
+	data/tracks/<track>/geometry/track_bvh.dat (and turn 2nd array's entries' offsets into pointers)
+	data/tracks/<track>/geometry/track_spvs.dat
+	data/global/dynamics/dynamic_objects.bed
+	data/settings/lods.ini
+	data/tracks/<track>/lighting/vertexcolors_w2.w32
+	data/tracks/<track>/geometry/track_geom.w32
+	data/tracks/<track>/geometry/track_cdb2.gen
+	data/tracks/<track>/geometry/plant_vdb.gen (loading of this is pretty weird...)
+	data/tracks/<track>/geometry/plant_geom.w32
+	data/tracks/<track>/data/resetmap.4b
+	data/tracks/<track>/data/trackai.bin
+	cars (player's?)
+	drivers (player's?)
+	[ cdb tree traversial starts here ]
+	data/tracks/<track>/data/camera.ini
+	data/scripts/cameratemplates.bed
+	menu stuff
+	flares and other graphics, map, particles, skybox
+	data/tracks/<track>/lighting/lightmap1_w2.dds
+	textures (in alphabetical order)
+	cars
+	drivers
+	hud
+	sounds
 
 
 
@@ -103,27 +103,26 @@ sounds
 BVH File Parsing
 ================
 
-BvhLoadingRelated1
-Return bvh filename in EDI (char*) and 0x109 in ESI (=?)
+	BvhLoadingRelated1
+	Return bvh filename in EDI (char*) and 0x109 in ESI (=?)
 
-Store 3rd int from track_bvh.gen in EBP+8
-Call 6035CE (bvhParseRelated1) with ((3rd int) << 5) parameter
-	""" safe_malloc, it appears. """
-	the first thing that does is call another function 6035A2 (bvhParseRelated2) with its its as one parameter (and *(0x6A30BC) as the other))
-	The memory is 0 in my case, the parameter 0x13D60.
-		""" Heap allocation with alternative in case of failure """
-		Since 0x13D60 is not above -0x20 (?!?), another function 603526 (bvhParseRelated3) is called with the (3rd int) << 5 parameter.
-			""" Safe heap allocation (using SE Handler) of size = Argument, result in EAX (or 0), init as 0xBAADF00D """
-			(
-			this pushes the arguments 0x0C and 0x658E78 and calls 606108 (bvhParseRelated4)
-				at this point I've had enough and continue
-			Looking at the stack, some SE (Structured Exception) Handler got setup and the level string got pushed, amongst others
-			round ESI to next hexnumber ending in 0 (i.e. multiple of 4)
-			Then space on the heap is allocated via ntdll.RtlAllocateHeap. Size = ESI = 0x13D60 (4-byte-aligned)
-			Some other function 606143 (bvhParseRelated5) is called.
-				It apparently undoes the SE Handler installing from bvhParseRelated4
-			)
-That functions
+	Store 3rd int from track_bvh.gen in EBP+8
+	Call 6035CE (bvhParseRelated1) with ((3rd int) << 5) parameter
+		""" safe_malloc, it appears. """
+		the first thing that does is call another function 6035A2 (bvhParseRelated2) with its its as one parameter (and *(0x6A30BC) as the other))
+		The memory is 0 in my case, the parameter 0x13D60.
+			""" Heap allocation with alternative in case of failure """
+			Since 0x13D60 is not above -0x20 (?!?), another function 603526 (bvhParseRelated3) is called with the (3rd int) << 5 parameter.
+				""" Safe heap allocation (using SE Handler) of size = Argument, result in EAX (or 0), init as 0xBAADF00D """
+				(
+				this pushes the arguments 0x0C and 0x658E78 and calls 606108 (bvhParseRelated4)
+					at this point I've had enough and continue
+				Looking at the stack, some SE (Structured Exception) Handler got setup and the level string got pushed, amongst others
+				round ESI to next hexnumber ending in 0 (i.e. multiple of 4)
+				Then space on the heap is allocated via ntdll.RtlAllocateHeap. Size = ESI = 0x13D60 (4-byte-aligned)
+				Some other function 606143 (bvhParseRelated5) is called.
+					It apparently undoes the SE Handler installing from bvhParseRelated4
+				)
 
 
 
@@ -138,34 +137,35 @@ read rest into one big buffer
 CDB2 tree traversal
 ===================
 
-SomeTreeFunc:
-	node = *ecx
-	edx = ARG.2889 << 2 // at 0056AF40 - result may be 0x20
-	if( node.flags & edx ) // "Arg-Flag-Test" below
-		if( ( node.flags & 3 ) == 3 ) // "flag & 3 test"
-			...
-		else
-			// 0, 1 & 2 pass.
-			// comparison is done with the 0nth/1st/2nd int after esp+90
-			// -> x/y/z?
-			highBytes = node.flags >> 8
-			ARG.6 = highBytes
-			ARG.24 = shortToInt( node.link1 )
-			EDI = shortToInt( node.link2 )
-			[ there's something huuuge on the stack that's used here ]
-			[ something in it is compared with node.link1 ]
-			[ if node.link1 is <= that thing (+90) ]
-				ecx = cdb2_buf + highBytes + 8 // probably +8 because node0 == root, thus never child
-				[ if node.link2 is >= another thing (+A0) ]
-					...
-				if ecx
-					goto SomeTreeFunc
-			else
+	SomeTreeFunc:
+		node = *ecx
+		edx = ARG.2889 << 2 // at 0056AF40 - result may be 0x20
+		if( node.flags & edx ) // "Arg-Flag-Test" below
+			if( ( node.flags & 3 ) == 3 ) // "flag & 3 test"
 				...
-	else
-		...
+			else
+				// 0, 1 & 2 pass.
+				// comparison is done with the 0nth/1st/2nd int after esp+90
+				// -> x/y/z?
+				highBytes = node.flags >> 8
+				ARG.6 = highBytes
+				ARG.24 = shortToInt( node.link1 )
+				EDI = shortToInt( node.link2 )
+				[ there's something huuuge on the stack that's used here ]
+				[ something in it is compared with node.link1 ]
+				[ if node.link1 is <= that thing (+90) ]
+					ecx = cdb2_buf + highBytes + 8 // probably +8 because node0 == root, thus never child
+					[ if node.link2 is >= another thing (+A0) ]
+						...
+					if ecx
+						goto SomeTreeFunc
+				else
+					...
+		else
+			...
 
 Visited nodes (forest1/a)
+
 	+-------+---------------+---------------+------------+------------+------------------+
 	| Index | Arg-Flag-Test | flag & 3 test | link1 test | link2 test | next node source |
 	+-------+---------------+---------------+------------+------------+------------------+
@@ -281,9 +281,9 @@ My progress
 			// should be the size in bytes of the recurring following strcuture.
 		// 4 bytes - into ESP+34 (after ReadFromFile) - 0x28F528 Content: 0x3CBF8
 			// possibly some offset?
-		
+	
 	// rest is data, saved in buffer
-
+	
 		// This is some recurring structure, I think. 
 		{
 			int unknown1/flags;  // or possibly Byte + Int24? typeID/flags + offset
@@ -333,14 +333,14 @@ user Diana from FOJ
 							  dwUnkOffset01 : Int24;      // Descr. later
 							  dwUnkData01   : Word;       // Possibly ItemID of another table
 							  dwUnkData02   : Word;       // Possibly ItemID of another table
-
+	
 	// dwUnkOffset01 - in most cases is an offset to element dsTable01, started 
 	//                 from begining of daTable01 or about of it. So you have to divide by 8 to
 	//                 get an index of daTable01 array;
 	// But with some values of dbType it has a different data, possibly an ItemID of another table;
-
+	
 	// File started at position 0
-
+	
 	daHeader        : array [00h..2Fh] of byte;
 	ddCount         : Dword;                                  // Number of bytes allocated by daTable01, so
 															  // count = (ddCount/8)
