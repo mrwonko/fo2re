@@ -377,7 +377,25 @@ Geom Files
 
 	{
 		int unknown1; // read to local variable; is 0x00020001 for forest1; some version?
-		int unknown2; // read to local variable; not read if unknown1 < [10210E8] (always 0x00020000?)
+		int unknown2; // read to local variable; not read if unknown1 < [10210E8] (always 0x00020000?) (not read in forest1/a/) (or is it? it appears to be in the file! or am I missing something at the start?)
+		
+		// SomeGeomRead():
+			int size1; // size1 * 4 bytes (or something like that) gets alloc'd (0x62 in forest1/a/) - those are later filled with addresses, likely to the results of reading the following structure:
+			// the following reading (someFileReading()) is skipped if size1 <= 0
+			// someFileReading():
+			{
+				char type[4]; // e.g. {'M','A','T','C'} - an int since that's more convenient
+				char* unknownString1; // NULL-Terminated, as short as possible
+				6 ints/4-byte-values
+				2 12-byte-values      // probably 3 4-byte-values each
+				4 16-byte-values
+				1 int/4-byte-value
+				char* unknownString2; // NULL-Terminated
+				char* unknownString3; // NULL-Terminated
+				char* unknownString4; // NULL-Terminated, often empty
+			}
+		
+		// SomeGeomRead2()
 		
 		something
 		
